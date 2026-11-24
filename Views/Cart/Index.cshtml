@@ -1,0 +1,60 @@
+@model CartViewModel
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<h1>Cart</h1>
+
+<div class="panel">
+    @if (Model.Lines.Count == 0)
+    {
+        <p class="empty">Your cart is empty. <a asp-controller="Products" asp-action="Index">Browse products</a> to add items.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th class="num">Unit price</th>
+                <th>Quantity</th>
+                <th class="num">Line total</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var line in Model.Lines)
+            {
+                <tr>
+                    <td>
+                        @line.Product.Name<br>
+                        <span class="sku">@line.Product.Sku</span>
+                    </td>
+                    <td class="num">@Money.Format(line.Product.Price)</td>
+                    <td>
+                        <form method="post" asp-controller="Cart" asp-action="Update" asp-route-productId="@line.Product.Id" class="inline">
+                            <input type="number" name="quantity" value="@line.Quantity" aria-label="Quantity">
+                            <button type="submit" class="secondary">Update</button>
+                        </form>
+                    </td>
+                    <td class="num">@Money.Format(line.LineTotal)</td>
+                    <td class="num">
+                        <form method="post" asp-controller="Cart" asp-action="Remove" asp-route-productId="@line.Product.Id" class="inline">
+                            <button type="submit" class="danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+        <form method="post" asp-controller="Checkout" asp-action="Store" class="summary">
+            @foreach (var line in Model.Lines)
+            {
+                <input type="hidden" name="prices[@line.Product.Id]" value="@line.Product.Price">
+            }
+            <span>Total <strong>@Money.Format(Model.Total)</strong></span>
+            <button type="submit">Place order</button>
+        </form>
+    }
+</div>

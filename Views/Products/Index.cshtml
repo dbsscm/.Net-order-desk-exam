@@ -1,0 +1,41 @@
+@model List<Product>
+@{
+    ViewData["Title"] = "Products";
+    var row = 0;
+}
+
+<h1>Products</h1>
+
+<div class="panel">
+    <table>
+        <thead>
+        <tr>
+            <th>Product</th>
+            <th class="num">Price</th>
+            <th class="num">In stock</th>
+            <th>Add to cart</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var product in Model)
+        {
+            row++;
+            <tr>
+                <td>
+                    @product.Name<br>
+                    <span class="sku">@product.Sku</span>
+                </td>
+                <td class="num">@Money.Format(product.Price)</td>
+                <td class="num">@product.Stock</td>
+                <td>
+                    <form method="post" asp-controller="Cart" asp-action="Add" class="inline">
+                        <input type="hidden" name="productId" value="@row">
+                        <input type="number" name="quantity" value="1" aria-label="Quantity">
+                        <button type="submit">Add to cart</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

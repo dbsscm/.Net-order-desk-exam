@@ -1,0 +1,54 @@
+@model OrdersIndexViewModel
+@{
+    ViewData["Title"] = "My orders";
+}
+
+<div class="toolbar">
+    <h1>My orders</h1>
+    <form method="get" asp-controller="Orders" asp-action="Index" class="inline">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+            <option value="">All</option>
+            @foreach (var status in Model.Statuses)
+            {
+                <option value="@status" selected="@(Model.SelectedStatus == status)">@OrderStatus.Label(status)</option>
+            }
+        </select>
+        <button type="submit" class="secondary">Filter</button>
+    </form>
+</div>
+
+<div class="panel">
+    @if (Model.Orders.Count == 0)
+    {
+        <p class="empty">No orders found.</p>
+    }
+    else
+    {
+        <table>
+            <thead>
+            <tr>
+                <th>Order</th>
+                <th>Placed</th>
+                <th class="num">Items</th>
+                <th class="num">Total</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var order in Model.Orders)
+            {
+                <tr>
+                    <td>#@order.Id</td>
+                    <td>@Dates.Format(order.CreatedAt)</td>
+                    <td class="num">@order.ItemsCount</td>
+                    <td class="num">@Money.Format(order.Total)</td>
+                    <td><span class="status status-@order.Status">@OrderStatus.Label(order.Status)</span></td>
+                    <td class="num"><a asp-controller="Orders" asp-action="Show" asp-route-id="@order.Id">View</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+</div>

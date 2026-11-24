@@ -1,0 +1,50 @@
+@model Order
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+}
+
+<div class="toolbar">
+    <h1>Order #@Model.Id</h1>
+    @if (Model.IsPending)
+    {
+        <form method="post" asp-controller="Orders" asp-action="Cancel" asp-route-id="@Model.Id" class="inline">
+            <button type="submit" class="danger">Cancel order</button>
+        </form>
+    }
+</div>
+<p class="meta">
+    Placed @Dates.Format(Model.CreatedAt)
+    &nbsp;<span class="status status-@Model.Status">@OrderStatus.Label(Model.Status)</span>
+</p>
+
+<div class="panel">
+    <table>
+        <thead>
+        <tr>
+            <th>Product</th>
+            <th class="num">Unit price</th>
+            <th class="num">Quantity</th>
+            <th class="num">Line total</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>
+                    @item.Product.Name<br>
+                    <span class="sku">@item.Product.Sku</span>
+                </td>
+                <td class="num">@Money.Format(item.UnitPrice)</td>
+                <td class="num">@item.Quantity</td>
+                <td class="num">@Money.Format(item.LineTotal)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <div class="summary">
+        <span>Total <strong>@Money.Format(Model.Total)</strong></span>
+    </div>
+</div>
+
+<p><a asp-controller="Orders" asp-action="Index">Back to my orders</a></p>
